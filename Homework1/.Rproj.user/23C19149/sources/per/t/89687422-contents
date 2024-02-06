@@ -1,0 +1,67 @@
+---
+title: 'DS 202 - Homework #1'
+author: "Gavin Herum"
+date: "09/04/23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## ![](BadStackOverflow.png)Asking good questions
+
+Asking good questions is a valuable skill to have - asking questions in an online setting is both easier and harder than asking questions in person: we can prepare to ask a question but we are also expected to prepare. The links posted here give some advice on how to ask good questions:
+
+-   stackoverflow's [Asking a good question](http://stackoverflow.com/help/how-to-ask)
+
+-   R's [Posting guidelines](https://www.r-project.org/posting-guide.html)
+
+-   [minimal complete verifiable example](https://stackoverflow.com/help/mcve), [minimal reproducible example](https://www.tidyverse.org/help/)
+
+Follow these links and read through the advice given, then
+
+0.  **Download the (R)Markdown file with these homework instructions to use as a template for your work. Make sure to replace "Your Name" in the YAML with your name.**
+
+1.  **Pick one question from stackoverflow and identify a minimum of three way(s) in which it is not asked well.**
+
+2.  **(1 point) Which question did you pick (link to it).**
+
+3.  **(1 point) Take a screenshot (or take a picture with your phone). Make sure to place the image in the same folder as your Rmarkdown file and include it in your (R)markdown file.**
+
+4.  **(3 points) Relate the readings to how the question is phrased: for that, write a paragraph on what a good question should do and then state what the stackoverflow question does. Identify at least three shortcomings.**
+
+5.  **(3 points) Re-phrase the question to make it better. You can use placeholders for information that is not given in the original question, e.g. "version" or "platform".**
+
+Note: (2 points) make sure that your submission is fully reproducible, i.e. the TA and I will 'knit' your submission in RStudio. Including any links to files is the tricky part here. Make sure that you don't use any file structure that depends on your computing environment.
+
+For the submission: submit a zipped file solution in an R Markdown file and (just for insurance) submit the corresponding html (or Word) file with it.
+
+The [chosen question](https://stackoverflow.com/questions/46710231/remove-complete-row-from-dataframe-if-begins-with-certain-word-r) could have been more specific on what It was asking for. It lacks clarity in what the user is wanting. There is no code being shown, just the input. The saying "blank out the row" is not descriptive in the terms on manipulating dataframes.
+
+![Stack Overflow Image](BadStackOverflow.png)
+
+A good question should provide context, information, a clear issue, and any given restrictions. Questions on stack overflow should be clear in their purpose on every level. The title should be clear and all the information in the question should be clear. Formatting with underlines and bold text can be really useful in making the important information clear. The title and the body of the question should always be correlated and the title should ideally be a quick one sentence question that communicates the issue. A good question should also be a new question, meaning exactly the same or similar enough to a question that has been asked before it is a bad question.\
+\
+In this question the title reads, "Remove a complete row from dataframe if begins with certain word: R", ignoring the grammatical shortcomings, the title is not concise and includes filler words that do not communicate anything. The question itself is also not unique, plenty of people have asked this before and there is countless tutorials online that answer and show exactly how to do this in R. The question completely lacks context, the poster does not provide any attempted solutions, or any errors. All of this makes it seem like posting the question was the first thing that the poster did when faced with this problem.
+
+Rephrasing the question:
+
+**How do I remove a row from a dataframe based on the content of the row in R**
+
+**Problem:**
+
+I am new to R and this is a basic process I have been struggling with. I am trying to remove rows that start with errorCode404errorMessage from my dataframe.
+
+**Context:**
+
+I am working in Rstudio on version \_\_\_ of R. I have looked up how to do this but have run into issues with the ways demonstrated (Link to what they tried to follow).
+
+I have tried X (Photo of code) but ran into issue Y (Photo of unique issue).
+
+If anyone has any insight into how to make X work, or where I went wrong it would be greatly appreciated.
+
+END OF REPHRASED QUESTION
+
+While I think this would be a better way to ask this question, it assumes that the person asking it has tried something and is running into some unique problem. The rephrased question is more consise in its intention and provides more information. The added structure to the question helps readers understand exactly what the person is asking.\
+I don't think this question should have been asked unless the person had tried to follow online examples and ran into some unexpected and unexplained issues. It is hard to rephrase this question without adding a ridiculous amount of information and issues that the original question lacks.
