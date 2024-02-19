@@ -43,23 +43,36 @@ data(banknote)
 6.  (1 pt) Use the package `ggplot2` to draw a scatterplot of two (continuous) measurements, color by `Status`. Find a pair of measurements that allow you to separate perfectly between genuine and counterfeit banknotes.
 
     ```{r}
-
+    library(ggplot2)
+    ggplot(banknote, aes(x=Diagonal, y=Right, colour=Status)) + geom_point()
     ```
 
 7.  (4.5 pts) For each of the three figures above, write a three sentence summary, describing the
 
     a.  **structure of the plot**: what type of plot is it? Which variables are mapped to x, to y, and to the (fill) color?
+
+        Bar: this is a bar plot, X is the Status and Y is the Count, the fill color is Status
+
+        Histogram: this is a histogram, Diagonal is the X and Y is Count, the fill color is Status
+
+        Scatter: this is a scatter plot, Diagonal is the X and Y is Right, the fill color is Status
+
     b.  **main message of the plot**: what is your main finding, i.e. what do you want viewers to learn from the plot?
+
+        Bar: the main finding is that there are an equal number of counterfeit and genuine banknotes in the data set
+
+        Histogram: the main finding is that there are distinct differences in the counterfeit and genuine banknotes and that diagonal is a good way to separate the different types of bank notes.
+
+        Scatter: the main finding is that the dimensions of the note are a key sign of whether a bank note is counterfeit or genuine and that given these stats there is a really high prediction rate of authentication.
+
     c.  **additional message**: point out anomalies or outliers, if there are any.
 
-    ```{r}
+        Bar: there is no outliers
 
-    ```
+        Histogram: there are some anomalies with a couple of genuine notes being lower than expected
+
+        Scatter: in large part everything is separated nicely, there is one genuine note that has a much higher Right than what would be expected, and some spread on the counterfeit notes in terms of Diagonal.
 
 8.  (1.5 pts) Ensure that your submission is reproducible. We will load your Rmd file into RStudio and knit it. This should match your submitted html/word file
-
-    ```{r}
-
-    ```
 
 For the submission: submit your solution in an R Markdown file. Also submit the corresponding html/word file with it.
