@@ -1,0 +1,92 @@
+---
+title: 'Homework #3'
+author: "Gavin Herum"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Palmer Penguins
+
+In this homework we will use the `penguins` data set. This data set is part of the `palmerpenguins` package. You can load the data set by executing the command:
+
+```{r}
+# install.packages("remotes")
+# remotes::install_github("allisonhorst/palmerpenguins")
+data(penguins, package="palmerpenguins")
+```
+
+If the command above throws an error message about the package not found, make sure to install the `palmerpenguins` package on your machine.
+
+The information in the penguins data is collected by several antarctic research teams, who took body measurements of different types of penguins in three different locations. See `?penguins` for a description of all of the variables and a bit of the scientific background of this data.
+
+1.  Download the RMarkdown file with these homework instructions to use as a template for your work. Make sure to replace "Your Name" in the YAML with your name.
+
+For all of the questions, we would like to see your answer based on R code, i.e. for each question include a code chunk with the relevant code AND write the answer to the question based on the code results in plain English.
+
+2.  How many penguins are part of the studies? What variables were collected in the data? Show your code.
+
+```{r}
+# Your code goes here
+pengDF <- data.frame(penguins)
+nrow(pengDF)
+colnames(pengDF)
+
+```
+
+**344 penguins were a part of the study, with variables: species, island, bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g, sex, and year.**<br> Rubric: 1 point (.5 for the code, 0.5 for the answer)
+
+3.  How does the length (`bill_length_mm`) of a penguin's beak relate to its depth (`bill_depth_mm`)? Use the `ggplot2` package to show a chart, describe the relationship in words. Describe the structure and propose a follow-up. (3 sentences: structure of the plot, what do you see, follow-up). <br> Rubric:
+
+-   1 point for constructing the plot
+
+-   1.5 pts for the 3-sentence description
+
+    ```{r}
+    library(ggplot2)
+    ggplot(data=pengDF, aes(x=bill_length_mm, y=bill_depth_mm)) + geom_point()
+    ```
+
+    There does not seem to be any relation between `bill_length_mm` and `bill_depth_mm` alone, however, when you account for the species I suspect that the clustering is consistent with different species. When comparing just `bill_length_mm` and `bill_depth_mm` there does not seem to be any clear trend lines. Because there is a lot of spread, you cannot say that `bill_length_mm` and `bill_depth_mm` have any relation between each other.
+
+-   To investigate the group structure you see in the scatterplot above (this is a mega hint as to what you should be seeing :) ) you decide to add color to the above scatterplot. First, map island to color, then map species to color. Describe the relationship between length (`bill_length_mm`) of a penguin's beak and its depth (`bill_depth_mm`) under these two color mappings. How do these color mappings inform the relationship between bill lengths and bill depths? <br> Rubric:
+
+```{=html}
+<!-- -->
+```
+-   1 point for constructing the two plots
+
+-   1.5 pts for the 3-sentence description of each plot (for a total of 3 pts)
+
+    ```{r}
+    library(ggplot2)
+    ggplot(data=pengDF, aes(x=bill_length_mm, y=bill_depth_mm, colour=island)) + geom_point()
+    ```
+
+    There seems to be some distinction between the islands. Dream and Biscoe have specific areas on the plot where there are clear relations. However, the upper left portion of the plot is a melting pot. There is no clear trend in the upper right, the only unique thing is that the upper left is the only place where penguines found on Torgersen island are seen.
+
+    ```{r}
+    library(ggplot2)
+    ggplot(data=pengDF, aes(x=bill_length_mm, y=bill_depth_mm, colour=species)) + geom_point()
+    ```
+
+    There does seem to be a relation between `bill_length_mm` and `bill_depth_mm` when you account for the species. Clustering within the different species is distinct and shows that there can be three distinct areas where you can conclude a relationship between `bill_length_mm` and `bill_depth_mm.`
+
+5.  What is the exact relationship between species and islands? Draw a barchart and add some color. Make sure to describe the relationship in words.<br> Rubric:
+
+-   1 point for constructing the plot
+
+-   1.5 pts for the 3-sentence description
+
+    ```{r}
+    library(ggplot2)
+    ggplot(pengDF, aes(island, colour=species)) + geom_bar()
+    ```
+
+    We can see that with a bar chart of species colored by island we can see that Chinstrap penguins and Gentoo penguins are unique on Dream island and Biscoe island respectively. The Adelie penguins are seen on every island in similar quantities and are the only penguins seen on the Torgersen island.
+
+Note: your submission is supposed to be fully reproducible, i.e. the TA and I will 'knit' your submission in RStudio.
+
+For the submission: submit your solution in an R Markdown file and (just for insurance) submit the corresponding html (or Word) file with it.
