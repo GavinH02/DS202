@@ -1,0 +1,108 @@
+---
+title: 'DS 202 - Homework #5'
+author: "Gavin Herum"
+output: html_document
+date: "11-07-2023"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Flying etiquette
+
+FiveThirtyEight is a website founded by Statistician and writer Nate Silver to publish results from opinion poll analysis, politics, economics, and sports blogging. One of the featured articles considers [flying etiquette](https://fivethirtyeight.com/features/airplane-etiquette-recline-seat/). This article is based on data collected by FiveThirtyEight and publicly available on github. Use the code below to read in the data from the survey:
+
+```{r}
+fly <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/flying-etiquette-survey/flying-etiquette.csv")
+```
+
+The following couple of lines of code provide a bit of cleanup of the demographic information by reaordering the levels of the corresponding factor variables. Run this code in your session.
+
+```{r}
+fly$Age <- factor(fly$Age, levels=c("18-29", "30-44", "45-60", "> 60", ""))
+fly$Household.Income <- factor(fly$Household.Income, levels = c("$0 - $24,999","$25,000 - $49,999", "$50,000 - $99,999", "$100,000 - $149,999", "150000", ""))
+fly$Education <- factor(fly$Education, levels = c("Less than high school degree", "High school degree", "Some college or Associate degree", "Bachelor degree",  "Graduate degree", ""))
+```
+
+1.  Download the RMarkdown file with these homework instructions to use as a template for your work. Make sure to replace "Your Name" in the YAML with your name.
+
+2.  Some people do not travel often by plane. Provide a (visual) breakdown of travel frequency (use variable `How.often.do.you.travel.by.plane.`). Reorder the levels in the variable by travel frequency from least frequent travel to most frequent. Draw a barchart of travel frequency and comment on it. Exclude all respondents who never fly from the remainder of the analysis. How many records does the data set have now?
+
+    ```{r}
+    library(ggplot2)
+
+    # Exclude respondents who never fly
+    survey_data <- fly %>%
+      filter(How.often.do.you.travel.by.plane. != "Never")
+
+    # Reorder levels in the variable by travel frequency
+    survey_data$How.often.do.you.travel.by.plane. <- factor(survey_data$How.often.do.you.travel.by.plane., 
+                                                            levels = names(sort(table(survey_data$How.often.do.you.travel.by.plane.))))
+
+    # Draw a barchart of travel frequency
+    ggplot(survey_data, aes(x = How.often.do.you.travel.by.plane.)) +
+      geom_bar(fill = "skyblue") +
+      labs(title = "Travel Frequency by Plane",
+           x = "Frequency of Plane Travel",
+           y = "Count") +
+      theme_minimal() + 
+      theme(axis.text.x=element_text(angle = -30, hjust = 0))
+
+    # Number of records in the dataset
+    n_records <- nrow(survey_data)
+    n_records
+    ```
+
+    There are 874 records in the survey data now.
+
+3.  In the demographic variables (`Education`, `Age`, and `Houshold.Income`), replace all occurrences of the empty string "" by a missing value `NA`. How many responses in each variable do not have any missing values? How many responses have no missing values in any of the three variables? (Hint: think of the function `is.na`)
+
+    ```{r}
+    # Replace empty strings with NA
+    survey_data$Education <- ifelse(survey_data$Education == "", NA, survey_data$Education)
+    survey_data$Age <- ifelse(survey_data$Age == "", NA, survey_data$Age)
+    survey_data$Household.Income <- ifelse(survey_data$Household.Income == "", NA, survey_data$Household.Income)
+
+    # Count responses without missing values in each variable
+    education_no_missing <- sum(!is.na(survey_data$Education))
+    age_no_missing <- sum(!is.na(survey_data$Age))
+    income_no_missing <- sum(!is.na(survey_data$Household.Income))
+
+    # Count responses with no missing values in any of the three variables
+    no_missing_all <- sum(complete.cases(survey_data[c("Education", "Age", "Household.Income")]))
+
+    # Display the counts
+    print(paste("Number of responses without missing values in Education:", education_no_missing))
+    print(paste("Number of responses without missing values in Age:", age_no_missing))
+    print(paste("Number of responses without missing values in Household Income:", income_no_missing))
+    print(paste("Number of responses with no missing values in any of the three variables:", no_missing_all))
+    ```
+
+4.  Run the command below and interpret the output. What potential purpose can you see for the chart? What might be a problem with the chart? Find at least one purpose and one problem.
+
+```{r, fig.width=8, fig.height=3, message=FALSE}
+library(ggplot2)
+fly$Education = with(fly, factor(Education, levels = rev(levels(Education))))
+
+ggplot(data = fly, aes(x = 1)) + 
+  geom_bar(aes(fill=Education), position="fill") + 
+  coord_flip() +
+  theme(legend.position="bottom") +
+  scale_fill_brewer() + 
+  xlab("Ratio") 
+```
+
+At a surface level, this is a bar chart separating out the level of education and showing proportionally the education level of the people surveyed. One problem, is that a bar chart is not the best way to show the proportions of a data set. Bar charts make it hard to compare between them with good reference especially because there isn't a great reference point on the X axis only showing every 25% mark.
+
+5.  Rename the variable `In.general..is.itrude.to.bring.a.baby.on.a.plane.` to `baby.on.plane.`. How many levels does the variable `baby.on.plane` have, and what are these levels? Rename the level labeled "" to "Not answered". Bring the levels of `baby.on.plane` in an order from least rude to most rude. Put the level "Not answered" last. Draw a barchart of variable `baby.on.plane`. Interpret the result. (This question is very similar to question 2, but preps the data for the next question)
+
+    ```{r}
+    library(base)
+    library(stats)
+    library(dplyr)
+    ```
+
+6.  Investigate the relationship between gender and the variables `Do.you.have.any.children.under.18.` and `baby.on.plane`. How is the attitude towards babies on planes shaped by gender and own children under 18? Find a plot that summarises your findings (use `ggplot2`).
+
+For the submission: submit your solution in an R Markdown file and (just for insurance) submit the corresponding html/word file with it.

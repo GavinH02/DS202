@@ -1,0 +1,99 @@
+---
+title: 'Homework #4'
+author: "Gavin Herum"
+date: "10/17/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Chick weights
+
+The `ChickWeight` data set is part of the base package `datasets`. See `?ChickWeight` for details on the data. For all of the questions use `dplyr` functions whenever possible.
+
+1.  Download the RMarkdown file with these homework instructions to use as a template for your work. Make sure to replace "Your Name" in the YAML with your name. To get full points, show your R code (in a code chunk) and write answers to the questions.
+
+2.  (1 pt) What variables are part of the dataset?
+
+    ```{r}
+    data("ChickWeight")
+    ?ChickWeight
+    ```
+
+    The data set has a **weight** variable that stores the given body weight of a chick in grams. A **Time** variable tracking the time since birth for the measurement. A **Chick** variable to identify which chick the data belongs to. And a **Diet** variable indicating which diet the chick was on.
+
+3.  (2 pts) Get a frequency breakdown of the number of chicks, their average weight and the standard deviation of the weights in each of the diets at the start of the study. <br> 0.5 pts of extra credit: construct a ggplot that shows average weights by diet with an interval (shown as a line) of +- the standard deviation around the averages. (Hint: read this article regarding [ggplot error bars](http://www.sthda.com/english/wiki/ggplot2-error-bars-quick-start-guide-r-software-and-data-visualization))
+
+```{r}
+library(ggplot2)
+library(base)
+library(stats)
+library(dplyr)
+
+# Calculate average weight and standard deviation by diet
+diet_summary <- ChickWeight %>%
+  group_by(Diet) %>%
+  summarize(avg_weight = mean(weight),
+            sd_weight = sd(weight))
+
+diet_summary
+```
+
+1.  (2.5 pts) Each chick should have twelve weight measurements. Use the dplyr package to identify how many chicks have a complete set of weight measurements and how many measurements there are on average in the incomplete cases. Extract a subset of the data for all chicks with complete information and name the data set `complete`. (Hint: you might want to use mutate to introduce a helper variable consisting of the number of observations)
+
+    ```{r}
+    # First, let's calculate the number of measurements for each chick
+    chicks_data <- ChickWeight %>%
+      group_by(Chick) %>%
+      mutate(num_measurements = n())
+
+    # Identify how many chicks have a complete set of weight measurements
+    complete_chicks <- chicks_data %>%
+      filter(num_measurements == 12)
+
+    # Calculate the number of measurements on average in the incomplete cases
+    incomplete_avg <- chicks_data %>%
+      filter(num_measurements != 12) %>%
+      summarize(avg_measurements = mean(num_measurements))
+
+    # Extract a subset of the data for all chicks with complete information
+    complete <- chicks_data %>%
+      filter(num_measurements == 12)
+    ```
+
+2.  (.5 pt) In the complete data set introduce a new variable that measures the current weight difference compared to day 0. Name this variable `weightgain`. (Hint: use mutate and `?mutate` to check the parameter `.by`. This parameter can create a temporary `group_by` so that we can do calculation in each subgroup, i.e. for each combination of chick and diet, `weight - min(weight)`)
+
+```{r}
+complete <- complete %>%
+  group_by(Chick, Diet) %>%
+  mutate(weightgain = weight - min(weight))
+
+complete
+```
+
+1.  (2.5 pts) Use ggplot2 to create side-by-side boxplots of `weightgain` by `Diet` for day 21. Describe the relationship in 2-3 sentences. Change the order of the categories in the Diet variable such that the boxplots are ordered by median `weightgain`.
+
+    ```{r}
+    complete <- complete %>%
+      mutate(Diet = factor(Diet, levels = levels(Diet)[order(tapply(weightgain, Diet, median))]))
+
+    # Filter data for day 21
+    day_21_data <- complete %>%
+      filter(Time == 21)
+
+    # Create boxplot
+    ggplot(day_21_data, aes(x = Diet, y = weightgain)) +
+      geom_boxplot(fill = "skyblue") +
+      labs(title = "Weight Gain by Diet for Day 21",
+           x = "Diet",
+           y = "Weight Gain") +
+      theme_minimal()
+    ```
+
+Each diet has a different expectation of weight gain. Diet 3 appears to be on average the best at putting on weight by day 21. The worst preforming diet on average was the first diet, with a mean weight gain around 125 gm.
+
+Note: 1.5 pts your submission is supposed to be fully reproducible, i.e. the TA and I will 'knit' your submission in RStudio.
+
+For the submission: submit your solution in an R Markdown file and (just for insurance) submit the corresponding html (or Word) file with it.
