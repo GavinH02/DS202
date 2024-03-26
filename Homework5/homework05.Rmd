@@ -31,6 +31,9 @@ fly$Education <- factor(fly$Education, levels = c("Less than high school degree"
 
     ```{r}
     library(ggplot2)
+    library(base)
+    library(stats)
+    library(dplyr)
 
     # Exclude respondents who never fly
     survey_data <- fly %>%
@@ -98,11 +101,41 @@ At a surface level, this is a bar chart separating out the level of education an
 5.  Rename the variable `In.general..is.itrude.to.bring.a.baby.on.a.plane.` to `baby.on.plane.`. How many levels does the variable `baby.on.plane` have, and what are these levels? Rename the level labeled "" to "Not answered". Bring the levels of `baby.on.plane` in an order from least rude to most rude. Put the level "Not answered" last. Draw a barchart of variable `baby.on.plane`. Interpret the result. (This question is very similar to question 2, but preps the data for the next question)
 
     ```{r}
-    library(base)
-    library(stats)
-    library(dplyr)
+
+    # Rename the variable
+    data <- survey_data %>% rename(baby.on.plane = In.general..is.itrude.to.bring.a.baby.on.a.plane.)
+
+    # Replace "" level to "Not answered"
+    data$baby.on.plane <- sub("^$", "Not answered", data$baby.on.plane)
+
+
+    # Draw a bar chart
+    ggplot(data, aes(x = baby.on.plane)) +
+      geom_bar(fill = "skyblue", color = "black") +
+      labs(title = "Is it rude to bring a baby on a plane?",
+           x = "Rudeness Level",
+           y = "Frequency") +
+      theme_minimal()
     ```
 
 6.  Investigate the relationship between gender and the variables `Do.you.have.any.children.under.18.` and `baby.on.plane`. How is the attitude towards babies on planes shaped by gender and own children under 18? Find a plot that summarises your findings (use `ggplot2`).
+
+    ```{r}
+    # Filter out rows with missing values in the relevant columns
+    data_filtered <- data %>% 
+      filter(!is.na(Gender) & !is.na(Do.you.have.any.children.under.18.) & !is.na(baby.on.plane))
+
+    # Create a plot
+    ggplot(data_filtered, aes(x = baby.on.plane , fill = Gender)) +
+      geom_bar(position = "dodge") +
+      facet_grid(Do.you.have.any.children.under.18. ~ .) +
+      labs(title = "Attitude Towards Babies on Planes by Gender and Children Under 18",
+           x = "Attitude Towards Babies on Planes",
+           y = "Frequency",
+           fill = "Gender") +
+      theme_minimal()
+    ```
+
+We can see that generally people without children are more likely to see children as rude. However, there is less entries from people with children so, the correlations should not be looked into too deeply. I do think however that this trend makes sense.
 
 For the submission: submit your solution in an R Markdown file and (just for insurance) submit the corresponding html/word file with it.
