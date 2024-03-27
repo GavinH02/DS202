@@ -1,0 +1,260 @@
+---
+title: "DS 202 -  Midterm - Spring 2024"
+author: "Gavin Herum"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+generate_seed <- function(name) {
+  name <- tolower(name)
+  name <- gsub("[^a-zA-Z]", "", name)
+  char_vec <- strsplit(name, split = "")[[1]]
+  num_vec <- sapply(char_vec, match, letters[1:26])
+  
+  result <- sum(num_vec)
+  
+  if (is.na(result)) return(1)
+  return(result)
+}
+```
+
+## Are you a cat or a dog person?
+
+This is an open book, open note exam. You have 75 mins of time to submit your answers to the questions. I expect you to adhere to academic integrity, i.e. all of the work shown is your own. Do not solicit, accept or give any direct or indirect help on the questions from or to anyone.
+
+Please be aware that during that you will have to sign off on the following statement during the submission process:
+
+> I affirm that the work on this exam is my own and I will not use any outside sources or people to help me nor will I share any part of this exam or my work with others without permission of the instructor.
+>
+> Gavin Herum
+
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+|------------------------------------------------------------------------|
+| Meet Ryder! [Ryder](https://www.petfinder.com/dog/ryder-69131352/ia/boone/boone-area-humane-society-ia06/) is a Husky at the Boone Area Humane Society looking for his forever home. \| ![](https://dl5zpyw5k3jeb.cloudfront.net/photos/pets/69131352/1/?bust=1697710607&width=720) \| \| For the following questions we are going to investigate animals in shelters that are up for adoption (scraped from the [Petfinder](petfinder.com) database). \| |
+
+### Before you start
+
+Please enter your name in this code chunk and replace `First_name` and `Last_name` by your first name and last name, respectively.
+
+```{r}
+my_name <- "Gavin Herum"
+```
+
+```{r data, message = FALSE, warning = FALSE}
+library(tidyverse)
+url <- "https://github.com/heike/data-technologies/raw/master/data/animals-ames.rds"
+download.file(url, destfile = "animal-ames.rds", mode="wb")
+animals <- readRDS("animal-ames.rds")
+animals <- animals[-(generate_seed(my_name) %% nrow(animals)), ]
+animals %>% select(id, organization_id, name, species, gender, size, age, attributes.house_trained) %>% head()
+```
+
+Among other variables, the following variables are part of the `animals` data set:
+
+| Variable     | Description                                             |     | Variable       | Description                                                                                |
+|-----------|---------------|-----------|-----------|---------------------------|
+| id           | animal identifier                                       |     | size           | size category (within species)                                                             |
+| organization | identifier of the shelter                               |     | coat           | type of fur/coat                                                                           |
+| url          | web link to animal profile                              |     | name           | name(s) of the animal                                                                      |
+| species      | species of the animal                                   |     | description    | textual description of circumstances/personality                                           |
+| age          | age category, one of 'Adult', 'Baby', 'Senior', 'Young' |     | attributes.\*  | five variables of the form attributes.XXX where XXX describes (medical) circumstances      |
+| gender       | sex of the animal                                       |     | environment.\* | three variables describing whether the animal is good with kids, other dogs and other cats |
+
+Provide code for all of your answers.
+
+### Part 1: getting an overview of the data
+
+-   Verify that there are 2413 animals in the dataset.
+
+```{r, warning = FALSE, message=FALSE}
+# your code goes here
+count(animals) #count will give us the number of rows, which confirms 2413
+# don't forget to write comments
+```
+
+-   Encode the variables `species`, `age`, and `gender` as factor variables.
+
+```{r, warning = FALSE, message=FALSE}
+# your code goes here
+animals$species <- factor(animals$species)
+animals$age <- factor(animals$age)
+animals$gender <- factor(animals$gender)
+animals
+```
+
+-   How many different animals are up for adoption by species? Draw a barchart of species, reorder by number of animals, and color the bars by gender (use `fill`). Describe the resulting figure with one sentence. Hint: `reorder()` `species` by the number of animals of each species. The third argument (`FUN`) of `reorder()` can be a function other than `mean()` or `median()`. Think about using `length()` for this question.
+
+```{r, warning = FALSE, message=FALSE}
+# your code goes here
+library(ggplot2)
+library(base)
+library(stats)
+library(dplyr)
+
+# Plotting
+ggplot(animals, aes(x = reorder(species, animals$species, FUN = length), fill = gender)) +
+  geom_bar() +
+  scale_fill_manual(values = c("pink", "blue", "gray")) +  # Adjust colors as needed
+  labs(title = "Number of Animals up for Adoption by Species and Gender",
+       x = "Species",
+       y = "Number of Animals") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better readability
+```
+
+The resulting chart shows a high concentration in more traditional pets like cats and dogs. We also see that there is more cats than dogs, specifically more female cats as there are roughly the same amount of male cats and male dogs.
+
+-   Create a subset of the `animals` data set that contains only cats and dogs. Call the result `cats_dogs`. Use this dataset for the remainder of the analysis. Hint: `species %in% ...`
+
+```{r, warning = FALSE, message=FALSE}
+# your code goes here
+cats_dogs <- subset(animals, animals$species %in% c("Cat", "Dog"))
+cats_dogs
+# don't forget to write comments
+```
+
+In case you did not get this question to work, set `eval` to `TRUE` in the chunk option below and access the object `cats_dogs`.
+
+```{r eval=FALSE}
+url <- "https://github.com/heike/data-technologies/raw/master/data/cats_dogs.rds"
+download.file(url, destfile = "cats_dogs.rds", mode="wb")
+cats_dogs <- readRDS("cats_dogs.rds")
+```
+
+-   Give a frequency break down of animals by their age (use variable `age`). What is the most common age of cats and dogs in shelters (in this dataset)?
+
+```{r, warning = FALSE, message=FALSE}
+# your code goes here
+age_frqBr <- table(cats_dogs$age) #Because it is factored already this works.
+
+MC_age <- names(age_frqBr)[which.max(age_frqBr)]
+num_at_age <- max(age_frqBr)
+cat("The most common age group is ", MC_age, " with ", num_at_age, " cats or dogs in the age group.")
+
+# 879 in the age group of Baby making it the most common age.
+```
+
+-   Order the levels in variable `age` from youngest to oldest. Draw a barchart of (the modified) age, facet by species and gender. Based on the plot, describe the overall appearance, and point out at least one difference between male/female cats/dogs in shelters. Hint: recall that you can specify the new order manually `factor(age, levels = ...)`
+
+```{r, warning = FALSE, message=FALSE}
+# your code goes here
+cats_dogs$age <- factor(cats_dogs$age, levels = c("Baby", "Young", "Adult", "Senior"))
+# Plotting
+ggplot(cats_dogs, aes(x = age, fill = gender)) +
+  geom_bar() +
+  facet_grid(species ~ gender) +
+  scale_fill_manual(values = c("pink", "blue", "gray")) +  # Adjust colors as needed
+  labs(title = "Number of Animals up for Adoption by Species, Gender and Age",
+       x = "Age Group",
+       y = "Number of Animals") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better readability
+# don't forget to write comments
+```
+
+-   Which two names are the most popular among all the animals in this dataset? How many animals share those names? Hint: `?arrange`, `?desc`, `?sort`, `?table`
+
+```{r, warning = FALSE, message=FALSE}
+# your code goes here
+name_frqBr <- table(cats_dogs$name) # creating frequency table
+name_length <- length(name_frqBr)
+sort(name_frqBr, partial = name_length-1)[name_length - 1] #most common name
+sort(name_frqBr, partial = name_length-2)[name_length - 2] #second most common name
+# Most common : Daisy with 7
+# Second Most common: Luna with 6
+```
+
+### Part 2: some data wrangling
+
+Eight questions of the `animals` data set describe the animals medical and behavioral traits:
+
+"attributes.spayed_neutered" "attributes.house_trained"\
+"attributes.declawed" "attributes.special_needs"\
+"attributes.shots_current" "environment.children"\
+"environment.dogs" "environment.cats"
+
+The values for these variables are logical, i.e. `TRUE` or `FALSE` (or missing `NA`).
+
+-   Bring the `cats_dogs` data into long form by combining the eight variable above. Call the names `attribute` and the values `value`. Call the result `cats_dogs_long`.
+
+```{r}
+# code and comments
+library(tidyr)
+# Selecting the relevant columns
+cats_dogs_subset <- cats_dogs[, c("attributes.spayed_neutered", 
+                                  "attributes.house_trained", 
+                                  "attributes.declawed", 
+                                  "attributes.special_needs", 
+                                  "attributes.shots_current", 
+                                  "environment.children", 
+                                  "environment.dogs", 
+                                  "environment.cats",
+                                  "species")]
+
+# Rename the columns for better readability
+names(cats_dogs_subset) <- c("spayed_neutered", 
+                             "house_trained", 
+                             "declawed", 
+                             "special_needs", 
+                             "shots_current", 
+                             "children", 
+                             "dogs", 
+                             "cats",
+                             "species")
+
+# Convert TRUE/FALSE to character values
+cats_dogs_subset <- cats_dogs_subset %>% 
+  mutate_at(vars(-("species")),~ifelse(.x, "TRUE", "FALSE"))
+
+# Convert to long form
+cats_dogs_long <- pivot_longer(cats_dogs_subset, 
+                               cols = -c("species"), 
+                               names_to = "attribute", 
+                               values_to = "value")
+
+# Display the first few rows of the long form data
+head(cats_dogs_long)
+```
+
+-   What are the dimensions of the new data set? How many values in the `value` variable are missing? Hint: `?is.na`. Recall that you can `sum` the `TRUE`s and `FALSE`s
+
+```{r}
+# code and comments
+#num_T <- sum(cats_dogs_long)
+dim(cats_dogs_long) # 18112 rows with 3 cols being species, attribute, then value
+sum(is.na(cats_dogs_long$value)) # there are 6452 values missing
+```
+
+-   Use the long form of the data to plot a barchart of `attribute`. Map `value` to `fill`. Facet by species. Make sure that labels are readable. Describe three insights you can read off this plot. Extra points: 1 extra point for each additional insight (up to 4 points).
+
+```{r}
+# code and comments
+# Plotting
+ggplot(cats_dogs_long, aes(x = attribute, fill = value)) +
+  geom_bar() +
+  facet_wrap(~ species, scales = "free_y") +
+  labs(title = "Distribution of Medical and Behavioral Traits by Species",
+       x = "Attribute",
+       y = "Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Things to note about the chart:
+
+1) The environmental attributes are the most likely to not be known. This makes sense as there is a large portion of animals in shelters that haven't been observed interacting with the environment factors.
+
+2) There are very few special needs cats and dogs. This makes sense as shelter animals with special needs cost more for the shelter to take care of, and generally have a lower adoption rate.
+
+3) Cats are more likely to be "fixed" when compared to dogs.
+
+4) Even when the environmental factors are labeled they are almost exclusively true. Few animals have these categories filled, and it seems that when it is filled it is almost always positive.
+
+5) Cats are more likely to be labeled as house trained.
+
+6) Cats unlike dogs have answers in the "declawed" catagory, seeing as dogs typically don't get declawed.
+
+7) Given that there are more cats than dogs in this data, the exact same area of bar on the dog graph and the cat graph will have more cats represented in that area than dogs. All this to say that the size of the sections of the bars is not proportional between the two charts.
+
+## You are done!
+
+Well done! Please upload this Rmd file in Canvas.
